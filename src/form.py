@@ -1,4 +1,4 @@
-import openai 
+from openai import OpenAI
 import streamlit as st
 import os
 from dotenv import load_dotenv
@@ -76,9 +76,8 @@ with st.form("experience"):
     experience_submit = st.form_submit_button()
     
 
-#api key
+#load api key
 load_dotenv()
-openai.api_key  = os.getenv("OPENAI_API_KEY")
 
 systm_msg = """Your role is to write cover letters for job applications. It is important that you keep the body of the cover letter to a maximum of 3 paragraphs and use a structure and writing style to maximise application success. The user will provide you with some important information that you must use when writing the message."""
 
@@ -91,12 +90,17 @@ Applicant email address = {worker_email} \n
 Relevant applicant experience = {experience} \n
 """
 
-
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 # Create a dataset using GPT
-response = openai.ChatCompletion.create(model="gpt-3.5-turbo",
-                                        messages=[{"role": "system", "content": systm_msg},
-                                         {"role": "user", "content": user_msg}])
+response = client.chat.completions.create(model="gpt-3.5-turbo",
+                                        messages=[
+                                        {"role": "system", "content": systm_msg},
+                                        {"role": "user", "content": user_msg}
+                                         ])
 
-rsp = response['choices'][0]['message']['content']
+rsp = response.choices[0].message.content
+
+print(rsp)
+
 
 st.write(rsp)
